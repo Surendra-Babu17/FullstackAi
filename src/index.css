@@ -155,3 +155,114 @@ body { background: linear-gradient(135deg,#fffdf9,#fff5ec); color:#111; min-heig
   justify-content: center;
   align-items: center;
 }
+/* --- Auth Forms (Login/Register) --- */
+.form-wrap {
+  width: 100%;
+  max-width: 420px;      /* small phones to large phones */
+  margin: 20px auto;
+  padding: 16px;
+}
+
+.form-card {
+  background: #fff;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(6,10,14,0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.form-card h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Form grid */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Inputs */
+.form-grid input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.08);
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box;
+}
+.form-grid input:focus {
+  border-color: #0b74de;
+  box-shadow: 0 6px 18px rgba(11,116,222,0.07);
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.btn-accent {
+  background: linear-gradient(90deg,#ff6a00,#ff8a2b);
+  color: white;
+  box-shadow: 0 8px 22px rgba(255,106,0,0.12);
+}
+.btn-accent:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error / Helper messages */
+.form-error {
+  color: #ef4444;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+/* Mobile responsive tweaks */
+@media (max-width: 480px) {
+  .form-wrap {
+    padding: 12px;
+    margin: 12px auto;
+  }
+
+  .form-card {
+    padding: 14px;
+  }
+
+  .form-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+
+  .form-grid input {
+    padding: 10px 12px;
+  }
+
+  .btn {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Optional: small desktop adjustments */
+@media (min-width: 641px) {
+  .form-wrap {
+    margin: 28px auto;
+    padding: 20px;
+  }
+  .form-card h2 {
+    font-size: 1.5rem;
+  }
+}
