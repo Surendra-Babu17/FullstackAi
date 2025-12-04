@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Register form styles — matches orange & white theme, uses your class names */
+
+/* container helper already existed (.max-w-md) — make it look clean */
+.max-w-md {
+  max-width: 28rem; /* 448px */
+  margin: 5rem auto 0; /* mt-20 mx-auto */
+  padding: 1.5rem; /* p-6 */
+  box-sizing: border-box;
+}
+
+/* card background used by register/login */
+.bg-card {
+  background: linear-gradient(180deg, #ffffff, #fffaf3);
+  border-radius: 1.25rem; /* rounded-2xl */
+  padding: 1.5rem;
+  box-shadow: 0 12px 34px rgba(15,15,15,0.06);
+  border: 1px solid rgba(0,0,0,0.04);
+  color: #111;
+}
+
+/* heading */
+.text-xl {
+  font-size: 1.25rem;
+}
+.font-semibold { font-weight: 600; }
+.mb-4 { margin-bottom: 1rem; }
+
+/* form layout */
+form.flex { display:flex; }
+.flex-col { flex-direction: column; }
+.gap-3 { gap: .75rem; }
+
+/* inputs */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.65rem 0.75rem; /* p-2 */
+  border-radius: 0.6rem;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.08); /* subtle border */
+  color: #111;
+  font-size: 15px;
+  transition: box-shadow .12s ease, border-color .12s ease, transform .08s ease;
+}
+input::placeholder { color: #9a9a9a; }
+
+input:focus {
+  outline: none;
+  border-color: #ff8a00;
+  box-shadow: 0 10px 30px rgba(255,138,0,0.06);
+  transform: translateY(-1px);
+}
+
+/* button (bg-accent) */
+.bg-accent,
+button[type="submit"].bg-accent,
+button.bg-accent {
+  background: linear-gradient(90deg,#FF8A00,#FF4300);
+  color: #062026; /* similar to text-[#04263a] but slightly adjusted for contrast */
+  padding: 0.6rem 1rem; /* px-4 py-2 */
+  border-radius: 0.6rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(255,110,0,0.10);
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+
+.bg-accent:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(255,100,0,0.16);
+}
+
+/* loading disabled style */
+button[disabled], button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* small screen adjustments */
+@media (max-width: 520px) {
+  .max-w-md { margin: 3rem 1rem 0; padding: 1rem; }
+  .bg-accent { width: 100%; display: block; text-align: center; }
+  input[type="text"], input[type="email"], input[type="password"] { padding: 0.6rem; font-size: 14px; }
+}
+
+/* optional subtle form helper text and error state */
+.form-note { font-size: 13px; color: #666; margin-top: 6px; }
+.input-error { border-color: rgba(220,38,38,0.9) !important; }
+.input-error + .form-note { color: rgba(220,38,38,0.85); font-weight:700; }

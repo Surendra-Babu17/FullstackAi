@@ -1,0 +1,193 @@
+/* Home.css — styles matching your exact classnames (orange & white theme) */
+
+/* container: makes first two .text-section side-by-side on wide screens */
+
+/* Home.css — layout + styles for top two columns + stacked info cards below */
+
+/* base resets for this page */
+.home-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  font-family: "Poppins", sans-serif;
+}
+
+/* TOP GRID: two columns on md+, stacked on mobile */
+.top-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* on medium screens and above show side-by-side */
+@media (min-width: 840px) {
+  .top-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+/* card-block (top two) styling */
+.card-block {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 12px 36px rgba(6,10,14,0.5);
+  backdrop-filter: blur(6px);
+}
+
+/* small header row inside each text-section */
+.badge-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+.section-badge {
+  background: linear-gradient(90deg,#ff6a00,#ff8a2b);
+  color:white;
+  padding:6px 10px;
+  border-radius:8px;
+  font-weight:600;
+  font-size:0.9rem;
+}
+.meta {
+  color: rgba(4, 3, 3, 0.8);
+  font-size:0.85rem;
+}
+
+/* section title */
+.section-title {
+  color: #fff;
+  margin: 8px 0 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* main textarea style */
+.main-textarea {
+  width: 100%;
+  min-height: 240px;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: #ffffff;
+  color: #111;
+  resize: vertical;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transition: transform .18s, box-shadow .18s;
+}
+.main-textarea:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+/* controls row */
+.controls {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:12px;
+  align-items:center;
+}
+.select {
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid rgba(0,0,0,0.06);
+  background:#1310c8;
+  font-weight:500;
+  color: #fff;
+}
+
+/* buttons */
+.btn {
+  padding:10px 14px;
+  border-radius:9px;
+  cursor:pointer;
+  border:none;
+  font-weight:00;
+}
+.btn-black {
+  background:#0b0b0b;
+  color:white;
+  box-shadow: 0 8px 20px rgba(11,11,11,0.28);
+}
+.btn-black:hover { transform: translateY(-3px); }
+
+.file-label { display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; cursor:pointer; }
+.hidden-file { display:none; }
+
+/* accent button */
+.btn-accent {
+  background: linear-gradient(90deg,#ff6a00,#ff8a2b);
+  color:rgb(226, 27, 27);
+  box-shadow: 0 8px 28px rgba(255,106,0,0.14);
+}
+.btn-accent:disabled { opacity:0.7; cursor:not-allowed; }
+
+/* right-actions (improved side) */
+.right-actions {
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+  flex-wrap:wrap;
+}
+.btn-outline {
+  padding:10px 14px;
+  border-radius:9px;
+  background: transparent;
+  border: 1px solid ;
+  cursor:pointer;
+  color:#f45d06;
+  
+}
+
+/* INFO GRID styling — stacked vertical on mobile (one column), grid on larger if desired */
+.info-grid {
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  width:100%;
+  
+}
+
+/* existing .card styles (keeps same look as previous card rules) */
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 12px 36px rgba(6,10,14,0.5);
+  backdrop-filter: blur(6px);
+
+  
+}
+
+/* launch pill */
+.inline-block {
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:4px;
+  background: rgba(0,0,0,0.55);
+  color:#ede6e6;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* make numbered badges consistent inside cards */
+.card .w-8 {
+  width:36px; height:36px;
+  display:inline-flex; align-items:center; justify-content:center;
+  border-radius:8px; background: linear-gradient(180deg,#ff6a00,#ff8a2b);
+  color:rgb(22, 15, 15); font-weight:700;
+}
+
+/* responsive tweaks */
+@media (max-width: 820px) {
+  .main-textarea { min-height: 200px; }
+  .top-grid { grid-template-columns: 1fr; }
+  .home-container { padding: 0 12px 32px; }
+}
