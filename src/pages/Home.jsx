@@ -12,36 +12,38 @@ export default function Home() {
   const [tone, setTone] = useState("professional");
   const [language, setLanguage] = useState("english");
 
-  const [loading, setLoading] = useState(false); // rewrite
-  const [saving, setSaving] = useState(false); // save history
-  const [playing, setPlaying] = useState(false); // play audio
-  const audioRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [playing, setPlaying] = useState(false);
 
+  const audioRef = useRef(null);
   const recognitionRef = useRef(null);
   const [listening, setListening] = useState(false);
+
+  // Check if user is logged in
+  const isLoggedIn = !!localStorage.getItem("access");
 
   useEffect(() => {
     if (window.SpeechRecognition || window.webkitSpeechRecognition) {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const r = new SR();
-      r.continuous = false;
-      r.interimResults = false;
-      r.lang = "en-US";
-      r.onresult = (e) => {
+      const recognition = new SR();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = "en-US";
+
+      recognition.onresult = (e) => {
         const text = e.results[0][0].transcript;
-        setInput((p) => (p ? p + " " + text : text));
+        setInput((prev) => (prev ? prev + " " + text : text));
       };
-      r.onend = () => setListening(false);
-      recognitionRef.current = r;
+
+      recognition.onend = () => setListening(false);
+      recognitionRef.current = recognition;
     }
-    // cleanup on unmount
+
     return () => {
-      if (recognitionRef.current && recognitionRef.current.stop) {
-        try { recognitionRef.current.stop(); } catch {}
-      }
+      recognitionRef.current?.stop?.();
       if (audioRef.current) {
-        try { audioRef.current.pause(); } catch {}
-        audioRef.current = null;
+        try { audioRef.current.pause(); } catch (e) {}
       }
     };
   }, []);
@@ -57,19 +59,27 @@ export default function Home() {
     }
   };
 
-  // ---- Rewrite (AI) ----
+  // ---- Rewrite ----
   const handleRewrite = async () => {
+    if (!isLoggedIn) {
+      toast("Please register or login first", "error");
+      return;
+    }
+
     if (!input.trim()) return toast("Enter text to rewrite", "error");
-    const token = localStorage.getItem("access");
-    if (!token) return toast("Please login/register to use this feature", "error");
+
     setLoading(true);
     try {
       const res = await api.rewrite({ text: input, tone, language });
-      const out = res.data?.rewritten_text || res.data?.text || res.data?.rewritten || (typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      const out =
+        res.data?.rewritten_text ||
+        res.data?.text ||
+        res.data?.rewritten ||
+        (typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       setResult(out);
       toast("Rewrite complete", "success");
     } catch (err) {
-      console.error("Rewrite error:", err?.response?.data || err.message);
+      console.error(err);
       toast("Rewrite failed", "error");
     } finally {
       setLoading(false);
@@ -78,138 +88,176 @@ export default function Home() {
 
   // ---- Save history ----
   const handleSave = async () => {
-    if (!result || !result.trim()) return toast("Nothing to save", "error");
+    if (!isLoggedIn) {
+      toast("Please register or login first", "error");
+      return;
+    }
+
+    if (!result.trim()) return toast("Nothing to save", "error");
+
     setSaving(true);
     try {
-      await api.saveHistory({ original_text: input || "", rewritten_text: result, tone });
+      await api.saveHistory({ original_text: input, rewritten_text: result, tone });
       toast("Saved to history", "success");
     } catch (err) {
-      console.error("Save history error:", err?.response?.data || err.message);
+      console.error(err);
       toast("Save failed", "error");
     } finally {
       setSaving(false);
     }
   };
 
-  // ---- Play / Text → Voice ----
+  // ---- Play / Text→Voice ----
   const handlePlay = async () => {
-    if (!result || !result.trim()) return toast("Nothing to play", "error");
+    if (!isLoggedIn) {
+      toast("Please register or login first", "error");
+      return;
+    }
+    if (!result.trim()) return toast("Nothing to play", "error");
     setPlaying(true);
 
-    // stop previous audio if any
+    // cleanup previous audio
     if (audioRef.current) {
-      try {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-      } catch {}
+      try { audioRef.current.pause(); } catch (e) {}
       audioRef.current = null;
     }
 
     try {
-      const res = await api.textToVoice({ text: result, language: language.slice(0, 2) || "en" });
+      console.log("==> handlePlay: requesting textToVoice");
+      const res = await api.textToVoice({ text: result, language: language.slice(0, 2) });
+      console.log("==> textToVoice response object:", res);
+      console.log("==> status:", res?.status, "content-type:", res?.headers?.["content-type"]);
 
-      // res.data might be a Blob, base64, or an URL string.
       let blob = null;
-      if (res.data instanceof Blob) {
-        blob = res.data;
-      } else if (res.data && typeof res.data === "object" && res.data.audio_base64) {
-        // backend returned base64 in JSON: { audio_base64: "..." }
-        const b64 = res.data.audio_base64;
+
+      // 1) ArrayBuffer (axios responseType: 'arraybuffer')
+      if (res && res.data && (res.data instanceof ArrayBuffer || (res.data.buffer && res.data.byteLength))) {
+        const arrayBuffer = res.data instanceof ArrayBuffer ? res.data : res.data.buffer;
+        const contentType = (res.headers && res.headers["content-type"]) || "audio/mpeg";
+        console.log("==> building blob from ArrayBuffer, contentType=", contentType);
+        blob = new Blob([arrayBuffer], { type: contentType });
+      }
+      // 2) JSON with audio_base64
+      else if (res && res.data && (res.data.audio_base64 || res.data.audioBase64)) {
+        const b64 = res.data.audio_base64 || res.data.audioBase64;
+        console.log("==> got audio_base64, length:", b64.length);
         const bytes = atob(b64);
-        const len = bytes.length;
-        const arr = new Uint8Array(len);
-        for (let i = 0; i < len; i++) arr[i] = bytes.charCodeAt(i);
+        const arr = new Uint8Array(bytes.length);
+        for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
         blob = new Blob([arr.buffer], { type: "audio/mpeg" });
-      } else if (typeof res.data === "string" && (res.data.startsWith("http") || res.data.startsWith("/"))) {
-        // backend returned a URL (absolute or relative)
+      }
+      // 3) string URL returned
+      else if (res && typeof res.data === "string" && (res.data.startsWith("http") || res.data.startsWith("/"))) {
+        console.log("==> got URL (string), playing via playUrl:", res.data);
         playUrl(res.data);
         return;
-      } else if (res.request && res.request.responseType === "blob" && res.data) {
-        // sometimes res.data not instance of Blob but contains binary
+      }
+      // 4) Blob itself
+      else if (res && res.data instanceof Blob) {
+        console.log("==> response is Blob");
         blob = res.data;
-      } else {
-        // last-resort: try to create blob from response
+      }
+      // 5) res.data is stringified JSON containing base64/url
+      else if (typeof res.data === "string") {
         try {
-          blob = new Blob([res.data], { type: "audio/mpeg" });
+          const parsed = JSON.parse(res.data);
+          console.log("==> parsed stringified JSON:", parsed);
+          if (parsed.audio_base64 || parsed.audioBase64) {
+            const b64 = parsed.audio_base64 || parsed.audioBase64;
+            const bytes = atob(b64);
+            const arr = new Uint8Array(bytes.length);
+            for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+            blob = new Blob([arr.buffer], { type: "audio/mpeg" });
+          } else if (parsed.url) {
+            playUrl(parsed.url);
+            return;
+          }
         } catch (e) {
-          console.error("Couldn't create blob from response:", e);
+          console.log("==> res.data is string but not JSON; content preview:", res.data.slice ? res.data.slice(0, 200) : res.data);
         }
       }
 
-      if (!blob) throw new Error("No audio returned from server");
+      if (!blob) {
+        console.error("==> No audio blob created. Response:", res);
+        toast("Voice generation returned no playable audio", "error");
+        setPlaying(false);
+        return;
+      }
 
       const url = URL.createObjectURL(blob);
-      const audio = new Audio();
+      console.log("==> created object URL:", url, " - opening for debug and attempting play");
+
+      // open debug tab so you can download & inspect audio if needed
+      try { window.open(url, "_blank"); } catch (e) { console.log("open tab failed:", e); }
+
+      const audio = new Audio(url);
       audioRef.current = audio;
-      audio.src = url;
+      try { audio.crossOrigin = "anonymous"; } catch (e) {}
+
       audio.onended = () => {
         setPlaying(false);
-        // revoke url after slight delay
-        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        URL.revokeObjectURL(url);
       };
-      audio.onerror = (e) => {
-        console.error("Audio playback error", e);
+      audio.onerror = (ev) => {
+        console.error("==> audio playback error:", ev);
         toast("Playback failed", "error");
         setPlaying(false);
-        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        URL.revokeObjectURL(url);
       };
 
-      // start playback
-      await audio.play();
-      // playing state will be cleared onended or onerror
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log("==> audio.play() started");
+          })
+          .catch((err) => {
+            console.error("==> audio.play() rejected:", err);
+            toast("Playback failed (autoplay/format)", "error");
+            setPlaying(false);
+            // debug tab remains open for inspection
+          });
+      }
     } catch (err) {
-      console.error("TextToVoice / play error:", err?.response?.data || err.message || err);
+      console.error("==> handlePlay caught error:", err);
       toast("Voice generation failed", "error");
       setPlaying(false);
     }
   };
 
-  // helper to play returned URL
-  const playUrl = (audioUrl) => {
-    try {
-      if (audioRef.current) {
-        try { audioRef.current.pause(); } catch {}
-        audioRef.current = null;
-      }
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-      setPlaying(true);
-      audio.onended = () => setPlaying(false);
-      audio.onerror = (e) => {
-        console.error("Audio URL playback error", e);
-        toast("Playback failed", "error");
-        setPlaying(false);
-      };
-      audio.play().catch((e) => {
-        console.error("Play rejected:", e);
-        toast("Playback failed", "error");
-        setPlaying(false);
-      });
-    } catch (e) {
-      console.error("playUrl error", e);
+  const playUrl = (url) => {
+    const audio = new Audio(url);
+    audioRef.current = audio;
+    setPlaying(true);
+    audio.onended = () => setPlaying(false);
+    audio.onerror = () => {
       toast("Playback failed", "error");
-    }
+      setPlaying(false);
+    };
+    audio.play().catch((e) => {
+      console.error("playUrl playback error:", e);
+      toast("Playback failed", "error");
+      setPlaying(false);
+    });
   };
 
-  // ---- Upload speech file -> transcribe ----
   const handleUploadSpeechFile = async (file) => {
     if (!file) return;
     try {
-      const resp = await api.speechToText({ file, language: language.slice(0, 2) });
-      const txt = resp.data?.text || resp.data?.transcript || resp.data?.result || "";
-      if (txt) {
-        setInput((p) => (p ? p + " " + txt : txt));
-        toast("Audio transcribed", "success");
-      } else {
-        toast("No transcription received", "error");
-      }
+      // if API expects FormData, create and pass FormData
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("language", language.slice(0, 2));
+      const res = await api.speechToText(formData);
+      const text = res.data?.text || res.data?.transcript || res.data?.result || "";
+      if (text) setInput((prev) => (prev ? prev + " " + text : text));
+      toast(text ? "Audio transcribed" : "No transcription received", text ? "success" : "error");
     } catch (err) {
-      console.error("speechToText error:", err?.response?.data || err.message);
+      console.error(err);
       toast("Audio transcription failed", "error");
     }
   };
 
-  // ---- Export TXT helper ----
   const handleExportTxt = (content) => {
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -217,64 +265,37 @@ export default function Home() {
     a.href = url;
     a.download = "rewritten.txt";
     a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    URL.revokeObjectURL(url);
   };
 
   return (
     <div className="home-container">
       <div className="top-grid">
+        {/* Original Text */}
         <div className="card-block">
-          <div className="badge-row">
-            <span className="section-badge">Original ✨</span>
-            <div className="meta">Input</div>
-          </div>
-          <h3 className="section-title">Original Text</h3>
-
+          <h3>Original Text</h3>
           <textarea
             className="main-textarea"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Paste or type your text..."
           />
-
           <div className="controls">
-            <select
-              value={tone}
-              onChange={(e) => setTone(e.target.value)}
-              className="select"
-              style={{ backgroundColor: "blue", color: "white" }}
-            >
+            <select value={tone} onChange={(e) => setTone(e.target.value)} className="select">
               <option value="professional">Professional</option>
               <option value="formal">Formal</option>
               <option value="casual">Casual</option>
               <option value="friendly">Friendly</option>
               <option value="concise">Concise</option>
             </select>
-
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="select"
-              style={{ backgroundColor: "blue", color: "white" }}
-            >
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className="select">
               <option value="english">English</option>
               <option value="telugu">Telugu</option>
               <option value="hindi">Hindi</option>
             </select>
 
-            <button type="button" onClick={toggleListen} className="btn btn-black">
-              {listening ? "Stop Mic" : "Speak"} 🔊
-            </button>
-
-            <label className="btn btn-black file-label">
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={(e) => handleUploadSpeechFile(e.target.files?.[0])}
-                className="hidden-file"
-              />
-              Upload audio 📁
-            </label>
+            
+            
 
             <button onClick={handleRewrite} disabled={loading} className="btn btn-accent">
               {loading ? "Rewriting..." : "Rewrite"} ✨
@@ -282,40 +303,22 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Improved Text */}
         <div className="card-block">
-          <div className="badge-row">
-            <span className="section-badge">Improved ✨</span>
-            <div className="meta">Output</div>
-          </div>
-
-          <h3 className="section-title">Improved Text</h3>
-
+          <h3>Improved Text</h3>
           <textarea
             className="main-textarea"
             value={result}
             onChange={(e) => setResult(e.target.value)}
             placeholder="Improved text will appear here..."
           />
-
-          <div className="right-actions">
-            <button
-              className="btn-outline"
-              onClick={() => handlePlay()}
-              disabled={playing}
-            >
-              {playing ? "Playing..." : "Play ▶️"}
-            </button>
-
-          
-
-            <button
-              className="btn-outline"
-              onClick={(e) => {
-                e.preventDefault();
-                handleExportTxt(result);
-              }}
-            >
+          <div className="controls">
+            
+            <button className="btn-outline" onClick={(e) => { e.preventDefault(); handleExportTxt(result); }} disabled={!result}>
               Export TXT 📤
+            </button>
+            <button className="btn btn-accent" onClick={handleSave} disabled={saving || !result.trim()}>
+              {saving ? "Saving..." : "Save 💾"}
             </button>
           </div>
         </div>

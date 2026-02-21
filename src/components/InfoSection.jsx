@@ -28,41 +28,101 @@ export default function InfoSection() {
       </div>
 
       <div className="card p-6">
-        <h3 className="text-xl font-bold text-white mb-3">Launch & updates</h3>
-        <p className="text-white/90 mb-4">Official launch date:</p>
-        <div className="inline-block bg-black/60 px-4 py-2 rounded-md border border-white/6 text-white font-semibold">
-          03 December 2025
+        <h3 className="text-xl font-bold text-white mb-3">
+          🚀 Launch & Updates
+        </h3>
+
+        <p className="text-white/90 mb-2">Official launch date:</p>
+
+        <div className="inline-block bg-black/60 px-4 py-2 rounded-md border border-white/10 text-white font-semibold mb-4">
+          📅 03 December 2025
         </div>
-        <p className="text-white/80 mt-4">Next updates: voice improvements, export templates, and multi-language polishing.</p>
+
+        <p className="text-white/80 mb-4">
+          The platform is continuously evolving with a focus on performance,
+          scalability, and user experience.
+        </p>
+
+        {/* Updates list */}
+        <ul className="space-y-3 text-white/85 text-sm leading-relaxed">
+          <li>
+            📤 <b>Export Templates</b>
+            <br />
+            <span className="text-white/70">
+              Predefined TXT / PDF templates with professional document formatting.
+            </span>
+          </li>
+
+          <li>
+            🌍 <b>Multi-Language Polishing</b>
+            <br />
+            <span className="text-white/70">
+              Improved accuracy for Telugu, Hindi, and English with better tone handling.
+            </span>
+          </li>
+
+          <li>
+            ⚖️ <b>Load Balancing (Scalability Upgrade)</b>
+            <br />
+            <span className="text-white/70">
+              Distributes user requests across multiple servers to prevent overload,
+              ensure faster response times, and support concurrent users reliably.
+            </span>
+          </li>
+        </ul>
       </div>
 
       <div className="card p-6">
         <h3 className="text-xl font-bold text-white mb-3">Key features</h3>
-        <ul className="space-y-3">
-          <li className="flex items-start gap-3">
-            <div className="w-8 h-8 flex items-center justify-center rounded bg-orange-500 text-white font-bold">1</div>
-            <div>
-              <div className="font-semibold text-white">Fast & clear rewrites</div>
-              <div className="text-white/80 text-sm">Turn rough drafts into polished text in one click.</div>
-            </div>
-          </li>
+          <ul className="space-y-5">
+  {/* Item 1 */}
+  <li className="flex items-start gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition">
+    <div className="w-9 h-9 flex items-center justify-center rounded-full bg-orange-500 text-white font-bold shadow">
+      1
+    </div>
+    <div>
+      <div className="font-semibold text-white text-base">
+        ⚡ Fast & Clear Rewrites
+      </div>
+      <div className="text-white/80 text-sm leading-relaxed">
+        Turn rough drafts into polished, professional text in just one click.
+      </div>
+    </div>
+  </li>
 
-          <li className="flex items-start gap-3">
-            <div className="w-8 h-8 flex items-center justify-center rounded bg-orange-500 text-white font-bold">2</div>
-            <div>
-              <div className="font-semibold text-white">History & export</div>
-              <div className="text-white/80 text-sm">Save versions, delete, copy, or download as PDF / TXT.</div>
-            </div>
-          </li>
+  {/* Item 2 */}
+  <li className="flex items-start gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition">
+    <div className="w-9 h-9 flex items-center justify-center rounded-full bg-orange-500 text-white font-bold shadow">
+      2
+    </div>
+    <div>
+      <div className="font-semibold text-white text-base">
+        📁 History & Export
+      </div>
+      <div className="text-white/80 text-sm leading-relaxed">
+        Save versions, copy content, delete entries, or export as PDF / TXT.
+      </div>
+    </div>
+  </li>
 
-          <li className="flex items-start gap-3">
-            <div className="w-8 h-8 flex items-center justify-center rounded bg-orange-500 text-white font-bold">3</div>
-            <div>
-              <div className="font-semibold text-white">Voice in/out</div>
-              <div className="text-white/80 text-sm">Speech-to-text upload and text-to-speech playback supported.</div>
-            </div>
-          </li>
-        </ul>
+  {/* Item 3 */}
+  <li className="flex items-start gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition">
+    <div className="w-9 h-9 flex items-center justify-center rounded-full bg-orange-500 text-white font-bold shadow">
+      3
+    </div>
+    <div>
+      <div className="font-semibold text-white text-base">
+        👨‍💻 Website Developers
+      </div>
+      <div className="text-white/80 text-sm leading-relaxed">
+        <b>G. Surendra Babu</b> — Full Stack Developer
+      </div>
+      <div className="text-white/80 text-sm leading-relaxed">
+        <b>M. Abhishek</b> — Full Stack Developer
+      </div>
+    </div>
+  </li>
+</ul>
       </div>
     </section>
   );

@@ -78,7 +78,7 @@ export default function Header() {
             </>
           ) : (
             <>
-              <div className="mobile-username">{username || "You"}</div>
+              <div className="mobile-username">{username || "🎭"}</div>
               <button className="mobile-logout" onClick={() => { setOpen(false); logout(); }}>Logout</button>
             </>
           )}

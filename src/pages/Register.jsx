@@ -14,11 +14,12 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!username || !email || !password) return toast("Fill all fields", "error");
+
     setLoading(true);
     try {
       const res = await api.register({ username, email, password });
-      const serverMsg = res?.data?.message || res?.data?.detail || "Registered successfully";
-      toast(serverMsg, "success");
+      const msg = res?.data?.message || res?.data?.detail || "Registered successfully";
+      toast(msg, "success");
       navigate("/login");
     } catch (err) {
       toast("Registration failed", "error");
@@ -32,10 +33,32 @@ export default function Register() {
       <div className="form-card">
         <h2>Register</h2>
         <form onSubmit={handleRegister} className="form-grid">
-          <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
-          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
-          <button type="submit" className="btn btn-accent">{loading ? "Registering..." : "Register"}</button>
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            maxLength={50}
+            autoComplete="username"
+          />
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            type="email"
+            autoComplete="email"
+            maxLength={80}
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            autoComplete="new-password"
+            maxLength={30}
+          />
+          <button type="submit" className="btn btn-accent" disabled={loading}>
+            {loading ? "Registering..." : "Register"}
+          </button>
         </form>
       </div>
     </div>

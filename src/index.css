@@ -266,3 +266,179 @@ body { background: linear-gradient(135deg,#fffdf9,#fff5ec); color:#111; min-heig
     font-size: 1.5rem;
   }
 }
+/* Toast container fixed top-right */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Base toast style */
+.toast {
+  min-width: 200px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  opacity: 0.95;
+  animation: slideIn 0.3s ease;
+}
+
+/* Success message - green */
+.toast.success {
+  background-color: #22c55e; /* Tailwind green-500 */
+}
+
+/* Error message - red */
+.toast.error {
+  background-color: #ef4444; /* Tailwind red-500 */
+}
+
+/* Slide-in animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 0.95;
+  }
+}
+/* Wrapper */
+.history-wrap {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+  background: linear-gradient(90deg,#ff6a00,#e78b40);
+  
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Heading */
+.history-wrap h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 26px;
+  color: rgb(6, 1, 11); /* sky blue */
+}
+
+/* List */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Single item */
+.history-item {
+  background: black;
+  border: 1px solid #1e293b;
+  color: #031004;
+  border-radius: 12px;
+  padding: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.history-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(56, 189, 248, 0.15);
+}
+
+/* Tone text */
+.history-item b {
+  color: #facc15; /* yellow */
+}
+
+/* History text */
+.history-item div:nth-child(2) {
+  margin: 10px 0;
+  line-height: 1.6;
+  font-size: 15px;
+  color: #e5e7eb;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Buttons container */
+.history-item > div:last-child {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.history-item button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+/* Copy */
+.history-item button:nth-child(1) {
+  background: #2563eb;
+  color: #fff;
+}
+.history-item button:nth-child(1):hover {
+  background: #1d4ed8;
+}
+
+/* Delete */
+.history-item button:nth-child(2) {
+  background: #dc2626;
+  color: #fff;
+}
+.history-item button:nth-child(2):hover {
+  background: #b91c1c;
+}
+
+/* PDF */
+.history-item button:nth-child(3) {
+  background: #16a34a;
+  color: #fff;
+}
+.history-item button:nth-child(3):hover {
+  background: #15803d;
+}
+
+/* Empty state */
+.history-list > div {
+  text-align: center;
+  color: #94a3b8;
+  padding: 30px;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #38bdf8;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .history-wrap {
+    margin: 16px;
+    padding: 16px;
+  }
+
+  .history-item {
+    padding: 12px;
+  }
+
+  .history-item button {
+    flex: 1;
+    text-align: center;
+  }
+}
